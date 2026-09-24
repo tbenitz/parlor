@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parlor — Video & Board Games</title>
+  <meta name="description" content="A private two-seat table. Chess, checkers, tic-tac-toe, or battleship against another person. Optional video. Peer-to-peer, no accounts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="landing" class="screen">
+      <div class="grain"></div>
+      <header class="topbar">
+        <div class="brand"><span class="mark" aria-hidden="true"></span><span>Parlor</span></div>
+        <p class="eyebrow">Peer-to-peer · No accounts · Two seats</p>
+      </header>
+      <div class="hero">
+        <p class="kicker">A private table</p>
+        <h1>Sit across from someone.<br /><em>Play something real.</em></h1>
+        <p class="lede">Chess, checkers, tic-tac-toe, or battleship against another person. Moves travel directly between browsers. Camera is optional.</p>
+        <div class="actions">
+          <button class="btn primary" id="btn-host" type="button">Host a table<span class="btn-hint">You share a code</span></button>
+          <button class="btn ghost" id="btn-show-join" type="button">Join a table<span class="btn-hint">Enter a code</span></button>
+          <button class="btn ghost" id="btn-preview" type="button">Preview the table<span class="btn-hint">Solo look around</span></button>
+        </div>
+        <form id="join-form" class="join-form hidden" autocomplete="off">
+          <label for="join-code">Table code</label>
+          <div class="join-row">
+            <input id="join-code" name="code" maxlength="8" placeholder="AB3K7Q" spellcheck="false" />
+            <button class="btn primary" type="submit">Sit down</button>
+          </div>
+        </form>
+      </div>
+      <ul class="features">
+        <li><strong>Play without a camera</strong> A table code is enough. Video and mic are optional.</li>
+        <li><strong>Four tables</strong> Chess, American checkers, tic-tac-toe, and battleship.</li>
+        <li><strong>Share a code</strong> Host creates a short table ID. The other person joins with it.</li>
+      </ul>
+    </section>
+    <section id="lobby" class="screen hidden">
+      <div class="grain"></div>
+      <header class="topbar">
+        <div class="brand"><span class="mark"></span><span>Parlor</span></div>
+        <button class="text-btn" id="btn-leave-lobby" type="button">Leave</button>
+      </header>
+      <div class="lobby-card">
+        <p class="kicker" id="lobby-kicker">Preparing the table</p>
+        <h2 id="lobby-title">Connecting…</h2>
+        <p class="lede" id="lobby-copy">Opening a handshake.</p>
+        <div class="code-block hidden" id="host-code-wrap">
+          <span class="label">Table code</span>
+          <div class="code-row"><code id="host-code">————</code><button class="btn small" id="btn-copy-code" type="button">Copy</button></div>
+          <p class="fine">Send this to the other person.</p>
+        </div>
+        <div class="status-line"><span class="dot" id="lobby-dot"></span><span id="lobby-status">Waiting…</span></div>
+      </div>
+    </section>
+    <section id="table" class="screen hidden">
+      <header class="table-bar">
+        <div class="brand compact"><span class="mark"></span><span>Parlor</span><span class="table-id" id="table-id"></span></div>
+        <div class="table-status"><span class="dot" id="net-dot"></span><span id="net-label">Linking…</span></div>
+        <div class="bar-actions">
+          <button class="icon-btn off" id="btn-mic" type="button" title="Microphone (optional)">mic</button>
+          <button class="icon-btn off" id="btn-cam" type="button" title="Camera (optional)">cam</button>
+          <button class="text-btn danger" id="btn-leave" type="button">Leave table</button>
+        </div>
+      </header>
+      <div class="table-grid">
+        <aside class="rail left-rail">
+          <div class="seat">
+            <video id="remote-video" autoplay playsinline></video>
+            <div class="seat-meta"><span id="remote-name">Across the table</span><span class="pill" id="remote-role">Guest</span></div>
+            <div class="video-fallback" id="remote-fallback">No camera — still playing</div>
+          </div>
+          <div class="seat self">
+            <video id="local-video" autoplay playsinline muted></video>
+            <div class="seat-meta"><span>You</span><span class="pill" id="local-role">Host</span></div>
+            <div class="video-fallback" id="local-fallback">Camera off</div>
+          </div>
+        </aside>
+        <main class="stage">
+          <div class="game-picker" id="game-picker">
+            <p class="kicker">Choose a game</p>
+            <h2>What shall we play?</h2>
+            <p class="fine" id="picker-hint">Either of you can start a game.</p>
+            <div class="game-cards">
+              <button class="game-card" data-game="chess" type="button"><span class="gc-icon">♞</span><span class="gc-name">Chess</span><span class="gc-sub">Full rules</span></button>
+              <button class="game-card" data-game="checkers" type="button"><span class="gc-icon">●</span><span class="gc-name">Checkers</span><span class="gc-sub">Kings · captures</span></button>
+              <button class="game-card" data-game="tictactoe" type="button"><span class="gc-icon">✕</span><span class="gc-name">Tic-tac-toe</span><span class="gc-sub">Best of a moment</span></button>
+              <button class="game-card" data-game="battleship" type="button"><span class="gc-icon">▣</span><span class="gc-name">Battleship</span><span class="gc-sub">Place, then fire</span></button>
+            </div>
+          </div>
+          <div id="game-root" class="game-root hidden">
+            <div class="game-toolbar">
+              <div>
+                <p class="kicker" id="game-title">Chess</p>
+                <p class="turn-line" id="turn-line">White to move</p>
+              </div>
+              <div class="toolbar-right">
+                <button class="btn small ghost" id="btn-reset-game" type="button">New game</button>
+                <button class="btn small ghost" id="btn-change-game" type="button">Change game</button>
+              </div>
+            </div>
+            <div id="board-host"></div>
+            <p class="status-msg" id="game-msg"></p>
+          </div>
+        </main>
+        <aside class="rail right-rail">
+          <div class="chat-card">
+            <p class="kicker">Table talk</p>
+            <div id="chat-log" class="chat-log"></div>
+            <form id="chat-form" autocomplete="off">
+              <input id="chat-input" maxlength="280" placeholder="Say something…" />
+              <button class="btn small" type="submit">Send</button>
+            </form>
+          </div>
+          <div class="hint-card">
+            <p class="kicker">How this works</p>
+            <p>Moves and chat travel directly between browsers. Camera is optional.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </div>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.12.1/chess.min.js"></script>
+  <script src="js/games.js"></script>
+  <script src="js/net.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
